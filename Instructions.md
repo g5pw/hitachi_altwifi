@@ -92,14 +92,24 @@ Lowering baudrate is *advised* to avoid read-write errors (default baudrate is a
 | device type | RTL87xx |
 | version board  | Generic - RTL8710BN (2MB/788k) |
 
-2. Build your firmware according to the instructions from this [repository](https://github.com/lumixen/esphome-hlink-ac). Set parameters as follows:
+2. Build a firmware.
+- Legacy hlink protocol
+  
+  You can build a custom firmware relying on the legacy Hitachi protocol (hlink) by following instructions from this [repository](https://github.com/lumixen/esphome-hlink-ac). This firmware is more mature but lacks some features such as half degree temperature increments.
 
-| parameter  | value |
-| --- | --- |
-| tx_pin | GPIO23 (UART_TXD) |
-| rx_pin  | GPIO18 (UART_RXD) |
-| baud_rate | 9600 |
-| parity | ODD |
+  Set parameters as follows:
+
+  | parameter  | value |
+  | --- | --- |
+  | tx_pin | GPIO23 (UART_TXD) |
+  | rx_pin  | GPIO18 (UART_RXD) |
+  | baud_rate | 9600 |
+  | parity | ODD |
+
+- new hlink2 protocol
+
+  This repository provides a custom firmware handling the new Hitachi protocol (hlink2). It is considered experimental.
+  Use the [provided model configuration file](https://github.com/clsergent/hitachi_altwifi/blob/main/build/device-model.yaml). 
 
 ## Flash the custom firmware
 1. Grab the UF2 version of the firmware
