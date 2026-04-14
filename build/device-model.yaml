@@ -1,0 +1,278 @@
+# Hlink2 model configuration
+
+# Target board
+rtl87xx:
+  board: generic-rtl8710bn-2mb-788k
+
+
+esphome:
+  name: hlink2model
+  platformio_options:
+    platform_packages:
+      # Fix ring buffer error
+      - framework-arduino-api @ https://github.com/clsergent/ArduinoCore-API#f470e0a7f7964957d88465ff3ac5a024aa04da06
+    build_flags: 
+      # Last version handled by realtek API
+      - -std=gnu++17
+      - -DLT_UART_RX_BUFFER_SIZE=1024
+    build_unflags:
+      -std=gnu++11
+  
+  # example of how to use 'action_custom_message' to send custom messages
+  on_boot:
+    - lambda: |-
+        id(hlink2ac).action_custom_message("CMD_IDU", std::vector<std::string>{"Mode:33", "OnOf:1"}, 3);
+
+
+# Enable logging
+logger:
+
+
+# Network is required by api
+network:
+
+
+# api is required to use action_custom_message
+api:
+
+
+uart:
+  id: hitachi_bus
+  tx_pin: GPIO23 #PA23 = UART_TXD
+  rx_pin: GPIO18 #PA18 = UART_RXD
+  baud_rate: 9600
+  parity: ODD
+  rx_buffer_size: 1024
+
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/clsergent/hitachi_altwifi.git
+    components: [hlink2]
+    # set refresh to 0s to force recompilation
+    refresh: 0s
+
+
+hlink2:
+  id: hlink2ac
+  uart_id: hitachi_bus
+  parameters:
+    # Esphome component task timeout, should remain under 50ms
+    task_timeout: 30ms
+    
+    # Number of bytes sent at once over UART
+    uart_tx_chunck_size: 16
+    
+    # Maximum amount of distinct mnemonics in a message
+    message_mnemonics_capacity: 13
+
+    # Default message update interval (each message can override this value)
+    message_update_interval: 30s
+
+    # Delay to process a message (request creation to answer processing)
+    message_update_timeout: 4s
+  mnemonics:
+  # List of custom mnemonics
+  # Default mnemonics doesn't have to be explicitely set)
+    - # Mnemonic name must be the value used in messages
+      name: Func1
+      # Message modes handled by the mnemonic (ie. STS, CMD)
+      mode: [STS, CMD]
+      # Message destination (ie. IDU for indoor unit, ODU for outdoor unit)
+      # A dedicated mnemonic must be created for each destination
+      dest: IDU
+
+
+button:
+  # Handled buttons
+  - platform: hlink2
+    filter_reset:
+      name: "reset_filter"
+  # Custom buttons can be added here
+  # They require a mnemonic handling CMD mode
+  - platform: hlink2
+    custom:
+      name: "Custom button"
+      mnemonic: IDU_Func1
+      # Value sent when button is pressed
+      value: 1
+      # Define if value should be send with surrounding quotes (false) or not (true)
+      raw: true
+      # Enable buzzer on button press
+      # If buzzer is disabled, this setting will NOT override it
+      buzzer: true
+      # 'qos' controls retries on failure and scales message timeout (0=low, 1=medium, 2=high)
+      qos: high
+      # other esphome button attributes can be added here (state_class, etc.)
+  - platform: hlink2
+    custom:
+      name: "Custom button2"
+      # alternative way to set the mnemonic
+      mnemonic:
+        name: Func1
+        dest: IDU
+
+climate:
+  - platform: hlink2
+    name: "Hitachi AC"
+    hvac_actions: true
+    command:
+      # 'buzzer' option matches other hlink2 components
+      buzzer: true
+      # 'qos' option matches other hlink2 components
+      qos: high
+    status:
+      # component update interval (polling)
+      update_interval: 5s
+      # 'qos' option matches other hlink2 components
+      qos: low
+    # HA display settings
+    visual:
+      min_temperature: 16.0
+      max_temperature: 32.0
+      temperature_step:
+        target_temperature: 0.5
+        current_temperature: 0.5
+
+
+number:
+  - platform: hlink2
+    target_temperature:
+      name: "target_temperature"
+  # custom numbers can be added here
+  # they require a mnemonic handling CMD mode
+  - platform: hlink2
+    custom:
+      name: "Custom number"
+      mnemonic: IDU_Func1
+      min_value: 0
+      max_value: 10
+      step: 1
+      # 'buzzer' option matches other hlink2 components
+      buzzer: true
+      # 'qos' option matches other hlink2 components
+      qos: medium
+
+
+select:
+  # custom select can be added here
+  # they require a mnemonic handling CMD mode
+  - platform: hlink2
+    custom:
+      name: "Custom select"
+      mnemonic: IDU_Func1
+      options:
+        - '0'
+        - '1'
+        - 'any raw value'
+      # 'raw' option matches other hlink2 components
+      raw: true
+      # 'buzzer' option matches other hlink2 components
+      buzzer: true
+      # 'qos' option matches other hlink2 components
+      qos: medium
+
+sensor: 
+  - platform: hlink2
+    outdoor_temperature:
+      name: "outdoor_temperature"
+      # 'update_interval' option matches other hlink2 components
+      update_interval: 10s
+      # 'promote' allow to add the mnemonic in a message with an update interval lower than the one defined in the sensor
+      # it allow to group mnemonics in messages, reducing UART traffic
+      promote: true
+      # 'qos' option matches other hlink2 components
+      qos: low
+  - platform: hlink2
+    indoor_temperature:
+      name: "indoor_temperature"
+  - platform: hlink2
+    indoor_humidity:
+      name: "indoor_humidity"
+  - platform: hlink2
+    filter_usage:
+      name: "filter_usage"
+  - platform: hlink2
+    energy:
+      name: "total_energy"
+  - platform: hlink2
+    power:
+      name: "power"
+  - platform: hlink2
+    airflow:
+      name: "airflow"
+  - platform: hlink2
+    indoor_exchanger:
+      name: "indoor_exchanger"
+  - platform: hlink2
+    outdoor_exchanger:
+      name: "outdoor_exchanger"
+  - platform: hlink2
+    custom: 
+      name: "Custom sensor"
+      mnemonic: IDU_Func1
+      state_class: measurement
+      # custom sensors share the same attributes as native sensors (such as 'update_interval' or 'promote')
+      update_interval: 10s
+      promote: true
+
+switch:
+  # switch component handle only two states, '0' and '1'
+  # for more advanced states, used select instead
+  - platform: hlink2
+    buzzer:
+      name: "buzzer"
+  - platform: hlink2
+    led_wifi:
+      name: "wifi_led"
+  - platform: hlink2
+    led_timer:
+      name: "timer_led"
+  - platform: hlink2
+    preset_eco:
+      name: "preset_eco"
+  - platform: hlink2
+    custom:
+      name: "Custom switch"
+      mnemonic:
+        name: Func1
+        dest: IDU
+      # 'buzzer' option matches other hlink2 components
+
+
+text:
+  - platform: hlink2
+    custom:
+      name: "Func1"
+      mnemonic: IDU_Func1
+      # mode is default esphome attribute (ie. 'text' or 'password')
+      mode: text
+      # 'raw' option matches other hlink2 components
+      raw: true
+      # 'buzzer' option matches other hlink2 components
+      buzzer: true
+      # 'qos' option matches other hlink2 components
+      qos: high
+
+
+text_sensor:
+  - platform: hlink2
+    model:
+      name: "model"
+      # update interval is high to avoid fetching a long string too oftern
+      update_interval: 1h
+      # 'promote' is false to avoid adding the mnemonic to a message polled too often
+      promote: false
+            # 'qos' option matches other hlink2 components
+      qos: high
+  - platform: hlink2
+    custom:
+      name: "Func1"
+      mnemonic: IDU_Func1
+      # 'update_interval' option matches other hlink2 components
+      update_interval: 20s
+      # 'promote' option matches other hlink2 components
+      promote: false
+      # 'qos' option matches other hlink2 components
+      qos: high

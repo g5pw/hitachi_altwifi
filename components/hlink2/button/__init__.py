@@ -98,9 +98,9 @@ async def to_code(config):
             await cg.register_component(var, conf)
 
             if value := conf.get(CONF_VALUE):
-                cg.add(var.set_mnemonic_default(*generate_arguments(
+                cg.add(var.set_mnemonic(*generate_arguments(
                     generate_mnemonic(hlink2_ns, conf),
-                    cg.RawExpression(value),
+                    value,
                     generate_MessageParameters(hlink2_ns, conf),
                     conf.get(CONF_RAW)
               )))

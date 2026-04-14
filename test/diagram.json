@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "author": "Per-Board UART Lab",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-v1",
+      "id": "tester",
+      "top": -40,
+      "left": -50,
+      "attrs": {
+        "label": "DUAL-R3 #1 (Test Unit)",
+        "ledPower": "true"
+      }
+    }
+  ],
+  "connections": [
+    ["tester:TX0", "$serialMonitor:RX", "", []],
+    ["tester:RX0", "$serialMonitor:TX", "", []],
+    ["tester:D25",  "none:RX", "", [] ],
+    ["tester:D26",  "$serialMonitor:TX", "", [] ]
+  ],
+  "serialMonitor": {
+    "display": "always",
+    "newline": "lf",
+    "convertEol": false
+  }
+}

@@ -1,0 +1,8 @@
+[wokwi]
+version = 1
+
+# Default firmware for the first board in diagram.json (id="tester")
+firmware = "../build/firmware.bin"
+elf      = "../build/firmware.elf"
+# Optional: forward serial console to TCP port 4321
+rfc2217ServerPort = 4321
