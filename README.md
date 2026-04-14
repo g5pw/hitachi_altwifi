@@ -32,9 +32,12 @@ This list references tested models only. If another model is compatible, please 
 
 ## Protocol handling
 This project initially relied on custom firmware from [esphome-hlink-ac](https://github.com/lumixen/esphome-hlink-ac).
-However, firmware decompilation as well as UART sniffing revealed a new, undocumented [protocol](https://github.com/clsergent/hitachi_altwifi/blob/main/Protocol.md).
+However, firmware decompilation as well as UART sniffing revealed a new, undocumented [protocol](https://github.com/clsergent/hitachi_altwifi/blob/main/Protocol.md), which, for convenience, will be referred to as *hlink2*.
 
-A new firmware targeting this new protocol is in early development.
+A new firmware targeting *hlink2* is now available. It supports additional features such as 0.5 °C temperature increments.
+The firmware has been successfully tested on at least two AC units but should still be considered experimental at this stage
+
+Use the [provided model configuration file](https://github.com/clsergent/hitachi_altwifi/blob/main/build/device-model.yaml) to build your firmware.
 
 ## Credits
 Initial custom firmware provided by [esphome-hlink-ac](https://github.com/lumixen/esphome-hlink-ac) for legacy binary HLINK protocol.
