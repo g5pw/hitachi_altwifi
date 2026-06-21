@@ -48,7 +48,7 @@ void Climate::setup() {
   status_->add_callback([this]() { this->set_preset(); this->publish_state(); });
 
   if(!(this->control_ = this->get_parent()->register_persistent_message<Mnemonic::Mode::CMD, Mnemonic::Dest::IDU>(this->control_params_)) ) {
-    this->mark_failed("register_command_message failed");
+    this->mark_failed(LOG_STR("register_command_message failed"));
     return;
   }
   this->request_OnOf = this->control_->add(Mnemonic::IDU_OnOf);
