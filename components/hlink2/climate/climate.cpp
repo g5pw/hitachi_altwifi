@@ -106,7 +106,7 @@ void Climate::set_preset() {
 void Climate::set_preset(uint32_t value) {
   /// this implementation doesn't allow multiple values at once, a bitmask test could be a better solution (but doesn't fit with presets)
   this->preset.reset();
-  this->custom_preset.reset();
+  this->clear_custom_preset_();
   switch (value) {
     case CLIMATE_PRESET_AWAY:
       this->preset = climate::CLIMATE_PRESET_AWAY;
@@ -121,7 +121,7 @@ void Climate::set_preset(uint32_t value) {
       ESP_LOGV(TAG, "set_preset: ECO");
       break;
     case CLIMATE_PRESET_SILENCE:
-      this->custom_preset = std::string(CLIMATE_CUSTOM_PRESET_SILENCE);
+      this->set_custom_preset_(CLIMATE_CUSTOM_PRESET_SILENCE);
       ESP_LOGV(TAG, "set_preset: SILENCE");
       break;
     case CLIMATE_PRESET_SLEEP:
@@ -360,8 +360,8 @@ void Climate::control(const climate::ClimateCall &call) {
   }
   
 
-  if (call.get_custom_preset()) {
-    if (*call.get_custom_preset() == CLIMATE_CUSTOM_PRESET_SILENCE) {
+  if (call.has_custom_preset()) {
+    if (call.get_custom_preset() == CLIMATE_CUSTOM_PRESET_SILENCE) {
         this->request_Opt1->set_request<uint8_t>(CLIMATE_PRESET_SILENCE >> 24 & 0xFF);
         this->request_Opt2->set_request<uint8_t>(CLIMATE_PRESET_SILENCE >> 16 & 0xFF);
         this->request_Opt3->set_request<uint8_t>(CLIMATE_PRESET_SILENCE >> 8 & 0xFF);
