@@ -7,6 +7,7 @@
 #include "../core.h"
 #include <cstddef>
 #include <cstdint>
+#include <set>
 
 namespace esphome {
 namespace hlink2 {
