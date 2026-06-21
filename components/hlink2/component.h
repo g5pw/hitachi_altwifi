@@ -20,17 +20,17 @@ class StatusComponent: public virtual Component, public virtual Parented<Core> {
   public:
     void setup() override {
       if (!this->mnemonic_ || !this->parameters_.update_interval) {
-        this->mark_failed("set_mnemonic not called");
+        this->mark_failed(LOG_STR("set_mnemonic not called"));
         return;
       }
       if (!this->get_parent()) {
-        this->mark_failed("get_parent failed");
+        this->mark_failed(LOG_STR("get_parent failed"));
         return;
       }
       if (!(this->message_ = this->get_parent()->register_status_mnemonic(*this->mnemonic_, this->parameters_, this->promote_))) {
         std::string report = "register_status_mnemonic failed ";
         report += this->mnemonic_->name;
-        this->mark_failed(report.c_str());
+        this->mark_failed(report);
 
       }
     }
@@ -41,7 +41,7 @@ class StatusComponent: public virtual Component, public virtual Parented<Core> {
     template<typename FUNC, uint32_t UPDATE_INTERVAL=MESSAGE_UPDATE_INTERVAL>
     void set_mnemonic(Mnemonic* m, FUNC&& callback, MessageParameters params, bool promote = CONF_MESSAGE_STS_PROMOTE) {
       if (!m) {
-        this->mark_failed("invalid mnemonic");
+        this->mark_failed(LOG_STR("invalid mnemonic"));
         return;
       }
       this->mnemonic_ = m;
@@ -81,11 +81,11 @@ class CommandComponent: public virtual Component, public virtual Parented<Core> 
   public:
     void setup() override {
       if (!this->mnemonic_) {
-        this->mark_failed("set_mnemonic not called");
+        this->mark_failed(LOG_STR("set_mnemonic not called"));
         return;
       }
       if (!this->get_parent()) {
-        this->mark_failed("get_parent failed");
+        this->mark_failed(LOG_STR("get_parent failed"));
         return;
       }
       switch (this->mnemonic_->dest) {
@@ -100,7 +100,7 @@ class CommandComponent: public virtual Component, public virtual Parented<Core> 
       if (!this->message_) {
         std::string report = "register_command_mnemonic failed ";
         report += this->mnemonic_->name;
-        this->mark_failed(report.c_str());
+        this->mark_failed(report);
         return;
       }
       this->request_ = this->message_->add(*this->mnemonic_);
@@ -120,7 +120,7 @@ class CommandComponent: public virtual Component, public virtual Parented<Core> 
     template<typename FUNC>
     void set_mnemonic(Mnemonic* m, FUNC&& callback, MessageParameters params) {
       if (!m) {
-        this->mark_failed("invalid mnemonic");
+        this->mark_failed(LOG_STR("invalid mnemonic"));
         return;
       }
       this->mnemonic_ = m;

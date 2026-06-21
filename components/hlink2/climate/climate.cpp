@@ -17,11 +17,11 @@ static const char *const TAG = "hlink2:climate";
 
 void Climate::setup() {
   if (!this->get_parent()) {
-    this->mark_failed("get_parent failed");
+    this->mark_failed(LOG_STR("get_parent failed"));
     return;
   }
   if (!(status_ = this->get_parent()->register_persistent_message<Mnemonic::Mode::STS, Mnemonic::Dest::IDU>(this->status_params_))) {
-    this->mark_failed("register_status_message failed");
+    this->mark_failed(LOG_STR("register_status_message failed"));
     return;
   }
 
